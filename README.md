@@ -1,6 +1,4 @@
-# Janki
-
-This is my attempt at developing a plugin for Joplin for streamlining note taking using Anki.
+# Joplin Plugin
 
 This is a template to create a new Joplin plugin.
 
