@@ -1,7 +1,7 @@
 {
 	"manifest_version": 1,
 	"id": "6811d63f-03cd-4754-b5b1-2df567045f49",
-	"app_min_version": "2.7",
+	"app_min_version": "2.6",
 	"version": "1.0.0",
 	"name": "Janki",
 	"description": "Plugin for interacting with Anki from Joplin",
