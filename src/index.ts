@@ -1,5 +1,5 @@
 import joplin from 'api';
-import { MenuItemLocation } from 'api/types';
+import { ContentScriptType, MenuItemLocation } from 'api/types';
 
 function noteHeaders(noteBody:string) {
 	const headers = [];
@@ -24,12 +24,18 @@ joplin.plugins.register({
 		await joplin.commands.register({
 			name: 'janki_higlight',
 			label: 'Highlights text and prints to console',
-			iconName: 'fas fa-music',
 			execute: async () => {
 				const selectedText = (await joplin.commands.execute('selectedText'));
+				await joplin.commands.execute('replaceSelection', ("<span id=\"anki\">" + selectedText + "</span>"));
 				joplin.clipboard.writeText(selectedText);
-				console.log(selectedText);
 
+				// [version using data api]
+				// const note_id = note.id;
+				// const note_content = (await joplin.data.get(['notes', note_id], {fields: ['body']})).body as string;
+				// const new_note_content = note_content.replace(selectedText, ("<span id=\"anki\">" + selectedText + "</span>"));
+				// await joplin.data.put(['notes', note_id], null, {body: new_note_content});
+
+				joplin.clipboard.writeText(selectedText);
 			},
 		});
 
