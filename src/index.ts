@@ -21,6 +21,12 @@ joplin.plugins.register({
 
 		console.log("Yeah bebe");
 
+		// Create the panel object
+		const panel = await joplin.views.panels.create('panel_1');
+
+		// Set some initial content while the TOC is being created
+		await joplin.views.panels.setHtml(panel, 'Loading...');
+
 		await joplin.commands.register({
 			name: 'janki_higlight',
 			label: 'Highlights text and prints to console',
