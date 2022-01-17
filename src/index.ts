@@ -25,7 +25,18 @@ joplin.plugins.register({
 		const panel = await joplin.views.panels.create('panel_1');
 
 		// Set some initial content while the TOC is being created
-		await joplin.views.panels.setHtml(panel, 'Loading...');
+		await joplin.views.panels.setHtml(panel, `
+		<h1>Janki Card Entry</h1>
+		<form>
+		<label for="fname">First name:</label><br>
+		<input type="text" id="fname" name="fname"><br>
+		<label for="lname">Last name:</label><br>
+		<input type="text" id="lname" name="lname">
+	  	</form>
+		`
+			);
+
+		await joplin.views.panels.hide(panel);
 
 		await joplin.commands.register({
 			name: 'janki_higlight',
@@ -42,6 +53,8 @@ joplin.plugins.register({
 				// await joplin.data.put(['notes', note_id], null, {body: new_note_content});
 
 				joplin.clipboard.writeText(selectedText);
+
+				await joplin.views.panels.show(panel);
 			},
 		});
 
