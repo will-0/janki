@@ -1,0 +1,71 @@
+div {
+    left: 1em;
+    right: 1em;
+}
+
+input[type=text] {
+    width: 100%;
+    padding: 6.5px 7px 7px;
+    font-size: 1.27em;
+    border: 0.5px solid grey;
+    border-radius: 1px;
+    margin: 1px 0;
+    font-family:'Segoe UI';
+    box-sizing: border-box;
+    outline: none;
+  }
+
+input[type=text]:focus {
+border: 2px solid rgb(219, 171, 109);
+}
+
+label {
+font-size: 75%;
+font-family:'Segoe UI';
+}
+
+label[for=tags] {
+    position: relative;
+    top: 9px;
+    left: 5px
+}
+
+body {
+background-color: #eeeeee;
+}
+
+button {
+    float: right;
+    width: 80px;
+    height: 23px;
+    margin: 0px 8px;
+    background-color: #f3f3f3;
+    border: 0.5px solid rgb(192, 192, 192);
+    border-radius: 4px;
+    font-family:'Segoe UI';
+}
+
+#tportion {
+    position: fixed;
+    top: 5em;
+}
+
+#bportion {
+    position: fixed;
+    bottom: 12px;
+}
+
+#tags {
+    width: 100%;
+    padding: 1px 2px 1px;
+    font-size: 0.75em;
+    font-family: Arial, Helvetica, sans-serif;
+    float: right;
+    padding-left: 10em;
+    margin: 10px 0;
+}
+
+#tagspan {
+    display: block;
+    padding-left: 2.5em;
+}

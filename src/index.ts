@@ -33,8 +33,9 @@ joplin.plugins.register({
 		<label for="lname">Last name:</label><br>
 		<input type="text" id="lname" name="lname">
 	  	</form>
-		`
-			);
+		`);
+
+		await joplin.views.panels.addScript(panel, './anki-editor/style.css')
 
 		await joplin.views.panels.hide(panel);
 
