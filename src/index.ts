@@ -2,6 +2,7 @@ import joplin from 'api';
 import { ContentScriptType, MenuItemLocation } from 'api/types';
 import { notEqual } from 'assert';
 import { create } from 'domain';
+import { title } from 'process';
 
 function anki_invoke(action, version, params={}) {
     return new Promise((resolve, reject) => {
@@ -33,22 +34,32 @@ function anki_invoke(action, version, params={}) {
     });
 }
 
-async function testFunction() {
-    console.log("Hello world!");
-    const result = await anki_invoke('createDeck', 6, {deck: 'jankidev'});
-    console.log(result);
+function replace_spaces(in_string, character)
+{
+	//** Gets rid of non-alphanumeric characters and replaces spaces with specified character */
+
+	return in_string.replaceAll(" ", "_").replace(/\W/g, '').replaceAll("_", character)
+	
 }
 
-async function get_note_hierarchy_string(note)
+// Gets the current address
+async function get_note_hierarchy_string()
 {
-	const note = await joplin.workspace.selectedNote();
+	let f = await joplin.workspace.selectedFolder();
 
-	let hierarchy_string = "";
+	let title_stack = [replace_spaces(f.title, "-")];
 
-	
-	
+	console.log(title_stack);
 
-	note.id
+	let i=0;
+	while ((f.parent_id != "") && (i < 10))
+	{
+		f = await joplin.data.get(['folders', f.parent_id], { fields: ['id', 'title', 'parent_id'] });
+		title_stack.push(replace_spaces(f.title, "-"));
+		i++;
+	}
+
+	return title_stack.reverse().join("::");
 }
 
 async function createCard(message) {
@@ -62,13 +73,13 @@ async function createCard(message) {
 
 	const note = await joplin.workspace.selectedNote();
 
-	// Manage the note tags
+	// // Manage the note tags
 	const note_tags = message.note_tags;
 	if (note_tags.includes("dev")) {note_tags.push("dev")};
 	if (note_tags.includes("janki")) {note_tags.push("janki")};
 
-	//Get the hierarchy string
-	const hierarchy_string = get_note_hierarchy_string(note);
+	// //Get the hierarchy string
+	const hierarchy_string = "Janki::" + await get_note_hierarchy_string();
 	note_tags.push(hierarchy_string);
 
 	// Build the AnkiConnect request
@@ -97,7 +108,7 @@ joplin.plugins.register({
 
 		console.log("Yeah bebe");
 
-		const note = await joplin.workspace.selectedNote();
+		const note = await joplin.workspace.selectedFolder();
 		console.log(note);
 
 		// Create the panel object
@@ -115,14 +126,14 @@ joplin.plugins.register({
 		<!-- <label for="citation">Citation</label><br>
 		<textarea rows="1" type="text" id="citation" name="citation"></textarea> -->
 		</form>
-	  	</div>
-	
+		</div>
+		
 		<div id="bportion">
 			<form>
 			<span id="tagspan"><textarea rows="1" type="text" id="tags" name="tags"></textarea></span>
 			<label for="tags">Tags</label>
 			</form>
-			<button type="button">Close</button>
+			<button type="button" onclick="console.log('Hello world');"">Close</button>
 			<button type="button" id="devbutton_createcard">Add</button>
 			<button type="button" id="devbutton_createdeck">Create deck (dev)</button>
 		</div>
@@ -131,10 +142,13 @@ joplin.plugins.register({
 		// Add the css and javascript to the webview
 		await joplin.views.panels.addScript(panel, './anki-editor/style.css');
 		await joplin.views.panels.addScript(panel, './anki-editor/js/textarea_expand.js');
+		await joplin.views.panels.addScript(panel, './anki-editor/js/main.js');
 
 		await joplin.views.panels.hide(panel);
 
 		await joplin.views.panels.onMessage(panel, (message) => {
+			console.log("Message received");
+
 			if (!message.hasOwnProperty("message_type"))
 			{
 				throw "Unexpected message from webview sandbox: no message_type property";
