@@ -41,7 +41,7 @@ async function createCard() {
     console.log("Creating card");
 
     const note_text = document.getElementById("textinput");
-    const note_extra = document.getElementById
+    const note_extra = document.getElementById("extra");
 
     const request = {
         "note": {
@@ -58,7 +58,7 @@ async function createCard() {
     }
 
     const result = await anki_invoke('addNote', 6, request);
-	
+
     console.log("Created note " + result);
 }
 
