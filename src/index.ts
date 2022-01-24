@@ -4,6 +4,9 @@ import { notEqual } from 'assert';
 import { create } from 'domain';
 import { title } from 'process';
 
+declare var invocation_reference;
+declare var anki_clipboard: string;
+
 function anki_invoke(action, version, params={}) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -97,7 +100,12 @@ async function createCard(message) {
         }
     }
 
-    const result = await anki_invoke('addNote', 6, request);
+	try {
+		const note_id = await anki_invoke('addNote', 6, request);
+		
+	}
+
+	
 
     console.log("Created note " + result);
 }
@@ -106,7 +114,7 @@ joplin.plugins.register({
 
 	onStart: async function() {
 
-		console.log("Yeah bebe");
+		console.log("Yeah Bebe");
 
 		const note = await joplin.workspace.selectedFolder();
 		console.log(note);
@@ -175,10 +183,14 @@ joplin.plugins.register({
 			label: 'Highlights text and prints to console',
 			execute: async () => {
 				const selectedText = (await joplin.commands.execute('selectedText'));
-				await joplin.commands.execute('replaceSelection', ("<span id=\"anki\">" + selectedText + "</span>"));
-				joplin.clipboard.writeText(selectedText);
+
+				invocation_reference = Date.now();
+
+				await joplin.commands.execute('replaceSelection', ("<span class=\"unverified-anki\" data-invocation-reference=\"" 
+					+ String(invocation_reference) + "\">" + selectedText + "</span>"));
 
 				joplin.clipboard.writeText(selectedText);
+				anki_clipboard = selectedText;
 
 				await joplin.views.panels.show(panel);
 			},
