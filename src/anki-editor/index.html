@@ -2,26 +2,27 @@
 <html>
 <body>
   <div id="tportion">
-    <link rel="stylesheet" href="style.css">
     <h1>Anki note editor</h1>
     <form>
     <label for="textinput">Text</label><br>
-    <input type="text" id="textinput" name="textinput"><br>
+    <textarea rows="1" type="text" id="textinput" name="textinput"></textarea><br>
     <label for="extra">Extra</label><br>
-    <input type="text" id="extra" name="extra">
-    <label for="citation">Citation</label><br>
-    <input type="text" id="citation" name="citation">
+    <textarea rows="1" type="text" id="extra" name="extra"></textarea>
+    <!-- <label for="citation">Citation</label><br>
+    <textarea rows="1" type="text" id="citation" name="citation"></textarea> -->
     </form>
   </div>
 
   <div id="bportion">
     <form>
-      <span id="tagspan"><input type="text" id="tags" name="tags"></span>
+      <span id="tagspan"><textarea rows="1" type="text" id="tags" name="tags"></textarea></span>
       <label for="tags">Tags</label>
     </form>
     <button type="button">Close</button>
     <button type="button">Add</button>
   </div>
 
+  <link rel="stylesheet" href="style.css">
+  <script src="textarea_expand.js"></script>
 </body>
 </html>

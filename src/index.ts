@@ -26,16 +26,30 @@ joplin.plugins.register({
 
 		// Set some initial content while the TOC is being created
 		await joplin.views.panels.setHtml(panel, `
-		<h1>Janki Card Entry</h1>
+		<div id="tportion">
+		<h1>Anki note editor</h1>
 		<form>
-		<label for="fname">First name:</label><br>
-		<input type="text" id="fname" name="fname"><br>
-		<label for="lname">Last name:</label><br>
-		<input type="text" id="lname" name="lname">
-	  	</form>
+		<label for="textinput">Text</label><br>
+		<textarea rows="1" type="text" id="textinput" name="textinput"></textarea><br>
+		<label for="extra">Extra</label><br>
+		<textarea rows="1" type="text" id="extra" name="extra"></textarea>
+		<!-- <label for="citation">Citation</label><br>
+		<textarea rows="1" type="text" id="citation" name="citation"></textarea> -->
+		</form>
+		</div>
+		
+		<div id="bportion">
+			<form>
+			<span id="tagspan"><textarea rows="1" type="text" id="tags" name="tags"></textarea></span>
+			<label for="tags">Tags</label>
+			</form>
+			<button type="button">Close</button>
+			<button type="button">Add</button>
+		</div>
 		`);
 
-		await joplin.views.panels.addScript(panel, './anki-editor/style.css')
+		await joplin.views.panels.addScript(panel, './anki-editor/style.css');
+		await joplin.views.panels.addScript(panel, './anki-editor/textarea_expand.js');
 
 		await joplin.views.panels.hide(panel);
 
@@ -46,12 +60,6 @@ joplin.plugins.register({
 				const selectedText = (await joplin.commands.execute('selectedText'));
 				await joplin.commands.execute('replaceSelection', ("<span id=\"anki\">" + selectedText + "</span>"));
 				joplin.clipboard.writeText(selectedText);
-
-				// [version using data api]
-				// const note_id = note.id;
-				// const note_content = (await joplin.data.get(['notes', note_id], {fields: ['body']})).body as string;
-				// const new_note_content = note_content.replace(selectedText, ("<span id=\"anki\">" + selectedText + "</span>"));
-				// await joplin.data.put(['notes', note_id], null, {body: new_note_content});
 
 				joplin.clipboard.writeText(selectedText);
 
