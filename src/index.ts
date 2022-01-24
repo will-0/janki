@@ -1,6 +1,7 @@
 import joplin from 'api';
 import { ContentScriptType, MenuItemLocation } from 'api/types';
 import { notEqual } from 'assert';
+import { create } from 'domain';
 
 function anki_invoke(action, version, params={}) {
     return new Promise((resolve, reject) => {
@@ -44,7 +45,7 @@ async function createCard(message) {
 	//check message conforms:
 	if (!message.hasOwnProperty("note_text") || !message.hasOwnProperty("note_extra") || !message.hasOwnProperty("note_tags"))
 	{
-		throw "Unexpected message from webview sandbox";
+		throw "Unexpected message from webview sandbox: insufficient information to create card";
 	}
 
 	// Manage the note tags
@@ -59,8 +60,9 @@ async function createCard(message) {
             "modelName": "JankiDev",
             "fields": {
                 "Text": message.note_text,
-                "Extra": message.note_extra
-				""
+                "Extra": message.note_extra,
+				"Joplin Note External Link": ,
+				"Joplin Note ID": 
             },
             "tags": note_tags
         }
@@ -111,7 +113,21 @@ joplin.plugins.register({
 
 		await joplin.views.panels.hide(panel);
 
-		await joplin.views.panels.onMessage(panel, createCard);
+		await joplin.views.panels.onMessage(panel, (message) => {
+			if (!message.hasOwnProperty("message_type"))
+			{
+				throw "Unexpected message from webview sandbox: no message_type property";
+			}
+
+			switch(message.message_type) {
+				case "card_create":
+					createCard(message);
+					break;
+
+				default:
+					throw "Unexpected message from webview sandbox: unknown message type";
+			}
+		});
 
 		await joplin.commands.register({
 			name: 'janki_higlight',
