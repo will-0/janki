@@ -34,32 +34,33 @@ async function testFunction() {
     console.log(result);
 }
 
+/**
+ * createCard() runs in the webview sandbox. When the button is clicked, it sends a message to the plugin with the following data:
+ * 
+ * - Text
+ * - Extra
+ * - Tags
+ */
 async function createCard() {
-    console.log("Creating card");
+    const note_text = document.getElementById("textinput");
+    const note_extra = document.getElementById("extra");
 
-    note_text = document.getElementById("textinput");
-    note_extra = document.getElementById
-
-    const request = {
-        "note": {
-            "deckName": "jankidev",
-            "modelName": "JankiDev",
-            "fields": {
-                "Text": "Test this {{c1::beep beep}}",
-                "Extra": "",
-            },
-            "tags": [
-                "janki"
-            ]
-        }
+    pluginmessage = {
+        note_text : document.getElementById("textinput"),
+        extra : document.getElementById("extra"),
+        tags : document.getElementById("tags").split(" ")
     }
 
-    const result = await anki_invoke('addNote', 6, request);
-    console.log(result);
+    const response = await webviewApi.postMessage(pluginmessage)
+
+    if (response)
+    {
+        console.log("Success");
+    }
+    else
+    {
+        console.log("Failure");
+    }
 }
 
-document.getElementById("devbutton_createdeck").onclick = testFunction;
-document.getElementById("devbutton_createcard").onclick = createCard;
-
-// const result = await invoke('deckNames', 6);
-// console.log(`got list of decks: ${result}`);
+document.getElementById("devbutton_createcard").onclick = createCard

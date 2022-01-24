@@ -40,9 +40,6 @@ async function testFunction() {
 async function createCard() {
     console.log("Creating card");
 
-    const note_text = document.getElementById("textinput");
-    const note_extra = document.getElementById("extra");
-
     const request = {
         "note": {
             "deckName": "jankidev",
