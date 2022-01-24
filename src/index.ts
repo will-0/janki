@@ -39,6 +39,18 @@ async function testFunction() {
     console.log(result);
 }
 
+async function get_note_hierarchy_string(note)
+{
+	const note = await joplin.workspace.selectedNote();
+
+	let hierarchy_string = "";
+
+	
+	
+
+	note.id
+}
+
 async function createCard(message) {
     console.log("Creating card");
 
@@ -48,10 +60,16 @@ async function createCard(message) {
 		throw "Unexpected message from webview sandbox: insufficient information to create card";
 	}
 
+	const note = await joplin.workspace.selectedNote();
+
 	// Manage the note tags
 	const note_tags = message.note_tags;
 	if (note_tags.includes("dev")) {note_tags.push("dev")};
 	if (note_tags.includes("janki")) {note_tags.push("janki")};
+
+	//Get the hierarchy string
+	const hierarchy_string = get_note_hierarchy_string(note);
+	note_tags.push(hierarchy_string);
 
 	// Build the AnkiConnect request
     const request = {
@@ -61,8 +79,8 @@ async function createCard(message) {
             "fields": {
                 "Text": message.note_text,
                 "Extra": message.note_extra,
-				"Joplin Note External Link": ,
-				"Joplin Note ID": 
+				"Joplin Note External Link": "joplin://x-callback-url/openNote?id=" + note.id,
+				"Joplin Note ID": note.id
             },
             "tags": note_tags
         }
@@ -78,6 +96,9 @@ joplin.plugins.register({
 	onStart: async function() {
 
 		console.log("Yeah bebe");
+
+		const note = await joplin.workspace.selectedNote();
+		console.log(note);
 
 		// Create the panel object
 		const panel = await joplin.views.panels.create('panel_1');
