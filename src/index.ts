@@ -1,5 +1,6 @@
 import joplin from 'api';
 import { ContentScriptType, MenuItemLocation } from 'api/types';
+import { notEqual } from 'assert';
 
 function anki_invoke(action, version, params={}) {
     return new Promise((resolve, reject) => {
@@ -37,20 +38,31 @@ async function testFunction() {
     console.log(result);
 }
 
-async function createCard() {
+async function createCard(message) {
     console.log("Creating card");
 
+	//check message conforms:
+	if (!message.hasOwnProperty("note_text") || !message.hasOwnProperty("note_extra") || !message.hasOwnProperty("note_tags"))
+	{
+		throw "Unexpected message from webview sandbox";
+	}
+
+	// Manage the note tags
+	const note_tags = message.note_tags;
+	if (note_tags.includes("dev")) {note_tags.push("dev")};
+	if (note_tags.includes("janki")) {note_tags.push("janki")};
+
+	// Build the AnkiConnect request
     const request = {
         "note": {
             "deckName": "jankidev",
             "modelName": "JankiDev",
             "fields": {
-                "Text": note_text,
-                "Extra": note_extra,
+                "Text": message.note_text,
+                "Extra": message.note_extra
+				""
             },
-            "tags": [
-                "janki"
-            ]
+            "tags": note_tags
         }
     }
 
@@ -98,6 +110,8 @@ joplin.plugins.register({
 		await joplin.views.panels.addScript(panel, './anki-editor/js/textarea_expand.js');
 
 		await joplin.views.panels.hide(panel);
+
+		await joplin.views.panels.onMessage(panel, createCard);
 
 		await joplin.commands.register({
 			name: 'janki_higlight',

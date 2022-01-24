@@ -42,13 +42,12 @@ async function testFunction() {
  * - Tags
  */
 async function createCard() {
-    const note_text = document.getElementById("textinput");
-    const note_extra = document.getElementById("extra");
 
     pluginmessage = {
+        message_type : "card_create",
         note_text : document.getElementById("textinput"),
-        extra : document.getElementById("extra"),
-        tags : document.getElementById("tags").split(" ")
+        note_extra : document.getElementById("extra"),
+        note_tags : document.getElementById("tags").split(" ")
     }
 
     const response = await webviewApi.postMessage(pluginmessage)
