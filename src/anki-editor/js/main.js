@@ -53,6 +53,7 @@ async function closeEditor() {
 
 // Script
 
+//Key shortcuts
 document.addEventListener('keydown', function (event) {
     activeEl = document.activeElement
     if ((activeEl.id == "textinput") && (event.ctrlKey && event.shiftKey && (event.key =='c' || event.key == 'C')))
@@ -66,3 +67,7 @@ document.addEventListener('keydown', function (event) {
         createCard();
     }
 });
+
+// Add functionality to the buttons
+document.getElementById("closeEditorButton").onclick = closeEditor;
+document.getElementById("createCardButton").onclick = createCard;

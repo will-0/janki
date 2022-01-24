@@ -4,8 +4,8 @@ import { notEqual } from 'assert';
 import { create } from 'domain';
 import { title } from 'process';
 
-declare var invocation_reference;
-declare var anki_clipboard: string;
+let invocation_reference = 0;
+let anki_clipboard: string;
 
 function anki_invoke(action, version, params={}) {
     return new Promise((resolve, reject) => {
@@ -100,14 +100,23 @@ async function createCard(message) {
         }
     }
 
-	try {
-		const note_id = await anki_invoke('addNote', 6, request);
-		
+	const anki_note_id = await anki_invoke('addNote', 6, request);
+	const note_content = note.body
+
+	const fact_hook = "class=\"unverified-anki\" data-invocation-reference=\"" + String(invocation_reference) + "\">"
+
+	console.log(fact_hook);
+
+	if (note_content.includes(fact_hook)) {
+		console.log("We got in here somehow");
+		const new_note_content = note_content.replace(fact_hook, ("class=\"anki-fact\" data-anki-id=\"" + String(anki_note_id) + "\">"));
+		joplin.commands.execute("editor.setText", new_note_content);
 	}
 
-	
+	// const new_note_content = note_content.replace(selectedText, ("<span id=\"anki\">" + selectedText + "</span>"));
+	// await joplin.data.put(['notes', note_id], null, {body: new_note_content});
 
-    console.log("Created note " + result);
+	console.log("Created note " + anki_note_id);
 }
 
 joplin.plugins.register({
@@ -135,14 +144,14 @@ joplin.plugins.register({
 		<textarea rows="1" type="text" id="citation" name="citation"></textarea> -->
 		</form>
 		</div>
-		
+	
 		<div id="bportion">
 			<form>
 			<span id="tagspan"><textarea rows="1" type="text" id="tags" name="tags"></textarea></span>
 			<label for="tags">Tags</label>
 			</form>
-			<button type="button" onclick="closeEditor">Close</button>
-			<button type="button" onclick="createCard">Add</button>
+			<button type="button" id="closeEditorButton">Close</button>
+			<button type="button" id="createCardButton">Add</button>
 		</div>
 		`);
 
