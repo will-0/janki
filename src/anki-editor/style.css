@@ -1,6 +1,7 @@
 div {
     left: 16px;
     right: 16px;
+    overflow-y: auto;
 }
 
 h1 {
@@ -14,7 +15,7 @@ h1 {
 
 textarea[type=text] {
     width: 100%;
-    padding: 6.5px 7px 7px;
+    padding: 6.5px 7px 9px;
     font-size: 20px;
     border: 0.5px solid grey;
     border-radius: 1px;
@@ -23,6 +24,7 @@ textarea[type=text] {
     box-sizing: border-box;
     outline: none;
     resize: none;
+    overflow-y: auto;
   }
 
 textarea[type=text]:focus {
@@ -55,7 +57,14 @@ button {
     border: 0.5px solid rgb(192, 192, 192);
     border-radius: 4px;
     font-family:'Segoe UI';
+    
 }
+
+button:hover, .btn:focus {
+    background-color: rgb(182, 205, 255);
+    border-color: rgb(51, 51, 250);
+    outline: 0;
+  }
 
 #tportion {
     position: fixed;

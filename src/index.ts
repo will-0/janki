@@ -1,18 +1,65 @@
 import joplin from 'api';
 import { ContentScriptType, MenuItemLocation } from 'api/types';
 
-function noteHeaders(noteBody:string) {
-	const headers = [];
-	const lines = noteBody.split('\n');
-	for (const line of lines) {
-		const match = line.match(/^(#+)\s(.*)*/);
-		if (!match) continue;
-		headers.push({
-			level: match[1].length,
-			text: match[2],
-		});
-	}
-	return headers;
+function anki_invoke(action, version, params={}) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener('error', () => reject('failed to issue request'));
+        xhr.addEventListener('load', () => {
+            try {
+                const response = JSON.parse(xhr.responseText);
+                if (Object.getOwnPropertyNames(response).length != 2) {
+                    throw 'response has an unexpected number of fields';
+                }
+                if (!response.hasOwnProperty('error')) {
+                    throw 'response is missing required error field';
+                }
+                if (!response.hasOwnProperty('result')) {
+                    throw 'response is missing required result field';
+                }
+                if (response.error) {
+                    throw response.error;
+                }
+                resolve(response.result);
+            } catch (e) {
+                reject(e);
+            }
+        });
+
+        xhr.open('POST', 'http://127.0.0.1:8765');
+        xhr.send(JSON.stringify({action, version, params}));
+    });
+}
+
+async function testFunction() {
+    console.log("Hello world!");
+    const result = await anki_invoke('createDeck', 6, {deck: 'jankidev'});
+    console.log(result);
+}
+
+async function createCard() {
+    console.log("Creating card");
+
+    const note_text = document.getElementById("textinput");
+    const note_extra = document.getElementById
+
+    const request = {
+        "note": {
+            "deckName": "jankidev",
+            "modelName": "JankiDev",
+            "fields": {
+                "Text": note_text,
+                "Extra": note_extra,
+            },
+            "tags": [
+                "janki"
+            ]
+        }
+    }
+
+    const result = await anki_invoke('addNote', 6, request);
+	
+    console.log("Created note " + result);
 }
 
 joplin.plugins.register({
@@ -36,20 +83,22 @@ joplin.plugins.register({
 		<!-- <label for="citation">Citation</label><br>
 		<textarea rows="1" type="text" id="citation" name="citation"></textarea> -->
 		</form>
-		</div>
-		
+	  	</div>
+	
 		<div id="bportion">
 			<form>
 			<span id="tagspan"><textarea rows="1" type="text" id="tags" name="tags"></textarea></span>
 			<label for="tags">Tags</label>
 			</form>
 			<button type="button">Close</button>
-			<button type="button">Add</button>
+			<button type="button" id="devbutton_createcard">Add</button>
+			<button type="button" id="devbutton_createdeck">Create deck (dev)</button>
 		</div>
 		`);
 
+		// Add the css and javascript to the webview
 		await joplin.views.panels.addScript(panel, './anki-editor/style.css');
-		await joplin.views.panels.addScript(panel, './anki-editor/textarea_expand.js');
+		await joplin.views.panels.addScript(panel, './anki-editor/js/textarea_expand.js');
 
 		await joplin.views.panels.hide(panel);
 
