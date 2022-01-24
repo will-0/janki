@@ -133,9 +133,8 @@ joplin.plugins.register({
 			<span id="tagspan"><textarea rows="1" type="text" id="tags" name="tags"></textarea></span>
 			<label for="tags">Tags</label>
 			</form>
-			<button type="button" onclick="console.log('Hello world');"">Close</button>
-			<button type="button" id="devbutton_createcard">Add</button>
-			<button type="button" id="devbutton_createdeck">Create deck (dev)</button>
+			<button type="button" onclick="closeEditor">Close</button>
+			<button type="button" onclick="createCard">Add</button>
 		</div>
 		`);
 
@@ -159,9 +158,16 @@ joplin.plugins.register({
 					createCard(message);
 					break;
 
+				case "close_note":
+					joplin.views.panels.hide(panel);
+					break;
+					
 				default:
-					throw "Unexpected message from webview sandbox: unknown message type";
+					console.log("Unexpected message from webview sandbox: unknown message type");
+					return 0;
 			}
+
+			return 1;
 		});
 
 		await joplin.commands.register({
