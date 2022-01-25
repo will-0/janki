@@ -56,14 +56,24 @@ async function closeEditor() {
 //Key shortcuts
 document.addEventListener('keydown', function (event) {
     activeEl = document.activeElement
+
+    // Add cloze deletions
     if ((activeEl.id == "textinput") && (event.ctrlKey && event.shiftKey && (event.key =='c' || event.key == 'C')))
     {
         fulltext = activeEl.value
+        highlighted_text = fulltext.slice(activeEl.selectionStart, activeEl.selectionEnd)
+
         activeEl.value = fulltext.slice(0, activeEl.selectionStart) + 
-            "{{c1::" + fulltext.slice(activeEl.selectionStart, activeEl.selectionEnd) + 
+            "{{c1::" + highlighted_text + 
                 "}}" + fulltext.slice(activeEl.selectionEnd);
+
+        // If creating an empty cloze, move inside the cloze
+        if (highlighted_text == "") { activeEl.selectionEnd -= 2 };
+
     }
-    if (event.ctrlKey && event.shiftKey && (event.key =='Enter')) {
+
+    // Ctrl-Enter card creation shortcut
+    if (event.ctrlKey && (event.key =='Enter')) {
         createCard();
     }
 });

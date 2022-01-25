@@ -105,10 +105,10 @@ async function createCard(message) {
 
 	const fact_hook = "class=\"unverified-anki\" data-invocation-reference=\"" + String(invocation_reference) + "\">"
 
-	console.log(fact_hook);
 
 	if (note_content.includes(fact_hook)) {
 		console.log("We got in here somehow");
+		console.log(note.body);
 		const new_note_content = note_content.replace(fact_hook, ("class=\"anki-fact\" data-anki-id=\"" + String(anki_note_id) + "\">"));
 		joplin.commands.execute("editor.setText", new_note_content);
 	}
