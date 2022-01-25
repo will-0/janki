@@ -14,9 +14,7 @@ async function createCard() {
         note_extra : document.getElementById("extra").value,
         note_tags : document.getElementById("tags").value.split(" ")
     }
-
-    console.log(pluginmessage);
-
+    
     const response = await webviewApi.postMessage(pluginmessage)
 
     if (response==1)
