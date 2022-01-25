@@ -185,17 +185,24 @@ joplin.plugins.register({
 			name: 'janki_higlight',
 			label: 'Highlights text and prints to console',
 			execute: async () => {
-				const selectedText = (await joplin.commands.execute('selectedText'));
 
-				invocation_reference = Date.now();
+				const anki_editor_open = await joplin.views.panels.visible(panel);
 
-				await joplin.commands.execute('replaceSelection', ("<span class=\"unverified-anki\" data-invocation-reference=\"" 
-					+ String(invocation_reference) + "\">" + selectedText + "</span>"));
+				if (!anki_editor_open)
+				{
+					await joplin.views.panels.show(panel);
+				} else
+				{
+					const selectedText = (await joplin.commands.execute('selectedText'));
 
-				joplin.clipboard.writeText(selectedText);
-				anki_clipboard = selectedText;
+					invocation_reference = Date.now();
 
-				await joplin.views.panels.show(panel);
+					await joplin.commands.execute('replaceSelection', ("<span class=\"unverified-anki\" data-invocation-reference=\"" 
+						+ String(invocation_reference) + "\">" + selectedText + "</span>"));
+
+					joplin.clipboard.writeText(selectedText);
+					anki_clipboard = selectedText;
+				}
 			},
 		});
 

@@ -1,12 +1,10 @@
-# Joplin Plugin
+# Janki (Joplin Anki Plugin)
 
-This is a template to create a new Joplin plugin.
+This plugin provides an Anki editor within the Joplin environment, allowing bidirectional links between your notes and your Anki cards.
 
-The main two files you will want to look at are:
+## Requirements
 
-- `/src/index.ts`, which contains the entry point for the plugin source code.
-- `/src/manifest.json`, which is the plugin manifest. It contains information such as the plugin a name, version, etc.
-
+You need to install the Anki-Connect add-on in Anki, and have Anki running in order to use this plugin.
 ## Building the plugin
 
 The plugin is built using Webpack, which creates the compiled code in `/dist`. A JPL archive will also be created at the root, which can use to distribute the plugin.
