@@ -88,7 +88,7 @@ async function createCard(message) {
 	// Build the AnkiConnect request
     const request = {
         "note": {
-            "deckName": "jankidev",
+            "deckName": "Conditions",
             "modelName": "JankiDev",
             "fields": {
                 "Text": message.note_text,
@@ -109,7 +109,13 @@ async function createCard(message) {
 	if (note_content.includes(fact_hook)) {
 		console.log("We got in here somehow");
 		console.log(note.body);
-		const new_note_content = note_content.replace(fact_hook, ("class=\"anki-fact\" data-anki-id=\"" + String(anki_note_id) + "\">"));
+
+		const replacement_text = "class=\"anki-fact\" data-anki-id=\"" + String(anki_note_id) + "\">"
+
+		const new_note_content = note_content.replace(fact_hook, replacement_text);
+
+		//checkme
+		await joplin.data.put(['notes', note.id], null, {body: new_note_content});
 		joplin.commands.execute("editor.setText", new_note_content);
 	}
 
