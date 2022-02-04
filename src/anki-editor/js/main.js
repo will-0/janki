@@ -15,18 +15,23 @@ async function createCard() {
         note_tags : document.getElementById("tags").value.split(" ")
     }
     
-    const response = await webviewApi.postMessage(pluginmessage)
+    // Everything here will be handled asynchronously
+    webviewApi.postMessage(pluginmessage)
+    .then((response) => {
+        console.log(response)
 
-    if (response==1)
-    {
-        console.log("Success");
-        document.getElementById("textinput").value = "";
-        document.getElementById("extra").value = "";
-    }
-    else
-    {
-        console.log("Failure");
-    }
+        if (response==true)
+        {
+            console.log("Card creation success");
+            document.getElementById("textinput").value = "";
+            document.getElementById("extra").value = "";
+        }
+        else
+        {
+            console.log("Card creation failure");
+        }
+    })
+    .catch(() => {console.log("Error posting message")})
 }
 
 async function closeEditor() {

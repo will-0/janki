@@ -1,7 +1,8 @@
 import joplin from 'api';
 import { ContentScriptType, MenuItemLocation } from 'api/types';
-import { notEqual } from 'assert';
+import { notEqual, rejects } from 'assert';
 import { create } from 'domain';
+import { resolve } from 'path';
 import { title } from 'process';
 
 let invocation_reference = 0;
@@ -64,7 +65,10 @@ async function get_note_hierarchy_string()
 }
 
 async function createCard(message) {
-	//check message conforms:
+
+	return new Promise<void>(async (resolve, reject) =>
+	{
+			//check message conforms:
 	if (!message.hasOwnProperty("note_text") || !message.hasOwnProperty("note_extra") || !message.hasOwnProperty("note_tags"))
 	{
 		throw "Unexpected message from webview sandbox: insufficient information to create card";
@@ -96,27 +100,33 @@ async function createCard(message) {
         }
     }
 
-	const anki_note_id = await anki_invoke('addNote', 6, request);
-	const note_content = note.body
+	anki_invoke('addNote', 6, request)
+		.then(async anki_note_id => {
 
-	const fact_hook = "class=\"unverified-anki\" data-invocation-reference=\"" + String(invocation_reference) + "\">"
+			const note_content = note.body
+
+			const fact_hook = "class=\"unverified-anki\" data-invocation-reference=\"" + String(invocation_reference) + "\">"
 
 
-	if (note_content.includes(fact_hook)) {
-		
-		const replacement_text = "class=\"anki-fact\" data-anki-id=\"" + String(anki_note_id) + "\">"
-		const new_note_content = note_content.replace(fact_hook, replacement_text);
+			if (note_content.includes(fact_hook)) {
+				
+				const replacement_text = "class=\"anki-fact\" data-anki-id=\"" + String(anki_note_id) + "\">"
+				const new_note_content = note_content.replace(fact_hook, replacement_text);
 
-		//checkme
-		await joplin.data.put(['notes', note.id], null, {body: new_note_content});
-		joplin.commands.execute("editor.setText", new_note_content);
+				//checkme
+				await joplin.data.put(['notes', note.id], null, {body: new_note_content});
+				joplin.commands.execute("editor.setText", new_note_content);
+			}
+			resolve();
+		}
+		)
+		.catch(() => {
+			console.log("Error occured in logging value");
+			reject();
+		})
+
+	})
 	}
-
-	// const new_note_content = note_content.replace(selectedText, ("<span id=\"anki\">" + selectedText + "</span>"));
-	// await joplin.data.put(['notes', note_id], null, {body: new_note_content});
-
-	console.log("Created note " + anki_note_id);
-}
 
 joplin.plugins.register({
 
@@ -156,29 +166,41 @@ joplin.plugins.register({
 
 		await joplin.views.panels.hide(panel);
 
-		await joplin.views.panels.onMessage(panel, (message) => {
-			console.log("Message received from sandbox");
+		await joplin.views.panels.onMessage(panel, async (message) => {
 
-			if (!message.hasOwnProperty("message_type"))
-			{
-				throw "Unexpected message from webview sandbox: no message_type property";
-			}
+			return new Promise<boolean>((resolve, reject) => {
+				// I want to always return with a resolve, as I want to pass this message to the sandbox
 
-			switch(message.message_type) {
-				case "card_create":
-					createCard(message);
-					break;
+				console.log("Message received from sandbox");
 
-				case "close_note":
-					joplin.views.panels.hide(panel);
-					break;
-					
-				default:
-					console.log("Unexpected message from webview sandbox: unknown message type");
-					return 0;
-			}
+				if (!message.hasOwnProperty("message_type"))
+				{
+					throw "Unexpected message from webview sandbox: no message_type property";
+				}
+	
+				switch(message.message_type) {
+					case "card_create":
+						createCard(message)
+							.then(() => {
+								resolve(true);
+							})
+							.catch(() => {
+								resolve(false)
+							})
+						return; //you have to add return to terminate completion of the function
+	
+					case "close_note":
+						joplin.views.panels.hide(panel);
+						break;
+						
+					default:
+						console.log("Unexpected message from webview sandbox: unknown message type");
+						resolve(false);
+				}
+	
+				throw new Error("Should not reach this part of the function")
 
-			return 1;
+			})
 		});
 
 		await joplin.commands.register({
