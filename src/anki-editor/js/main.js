@@ -1,3 +1,15 @@
+function update_text_area_size()
+{
+    var event = new Event('input', {
+        bubbles: true,
+        cancelable: true,
+    });
+    
+    //Reset the sizes
+    document.getElementById("textinput").dispatchEvent(event);
+    document.getElementById("extra").dispatchEvent(event);
+}
+
 
 /**
  * createCard() runs in the webview sandbox. When the button is clicked, it sends a message to the plugin with the following data:
@@ -26,14 +38,7 @@ async function createCard() {
             document.getElementById("textinput").value = "";
             document.getElementById("extra").value = "";
 
-            var event = new Event('input', {
-                bubbles: true,
-                cancelable: true,
-            });
-
-            //Reset the sizes
-            document.getElementById("textinput").dispatchEvent(event);
-            document.getElementById("extra").dispatchEvent(event);
+            update_text_area_size();
         }
         else
         {
@@ -81,6 +86,9 @@ document.addEventListener('keydown', function (event) {
 
         // If creating an empty cloze, move inside the cloze
         if (highlighted_text == "") { activeEl.selectionEnd -= 2 };
+
+        //Update the text area size
+        update_text_area_size()
 
     }
 

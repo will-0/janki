@@ -8,6 +8,16 @@ import { title } from 'process';
 let invocation_reference = 0;
 let anki_clipboard: string;
 
+function escapeHtml(unsafe)
+{
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
+
 function anki_invoke(action, version, params={}) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -219,8 +229,10 @@ joplin.plugins.register({
 
 					invocation_reference = Date.now();
 
+					const safe_text = escapeHtml(selectedText)
+
 					await joplin.commands.execute('replaceSelection', ("<span class=\"unverified-anki\" data-invocation-reference=\"" 
-						+ String(invocation_reference) + "\">" + selectedText + "</span>"));
+						+ String(invocation_reference) + "\">" + safe_text + "</span>"));
 
 					joplin.clipboard.writeText(selectedText);
 					anki_clipboard = selectedText;
