@@ -25,6 +25,15 @@ async function createCard() {
             console.log("Card creation success");
             document.getElementById("textinput").value = "";
             document.getElementById("extra").value = "";
+
+            var event = new Event('input', {
+                bubbles: true,
+                cancelable: true,
+            });
+
+            //Reset the sizes
+            document.getElementById("textinput").dispatchEvent(event);
+            document.getElementById("extra").dispatchEvent(event);
         }
         else
         {
