@@ -150,8 +150,19 @@ joplin.plugins.register({
 
 		// Set some initial content while the TOC is being created
 		await joplin.views.panels.setHtml(panel, `
-		<div id="tportion">
+		<div class="level-1" id="tportion">
+		<div class="deck-selector">
+		  <span class="align-horizontal">
+			<select name="decks" id="deck-selector">
+			  <option value="Conditions">Conditions</option>
+			  <option value="OMOP">OMOP</option>
+			</select>
+		  </span>
+		  <label for="decks">Deck</label>
+		</div>
+		<hr>
 		<h1>Anki note editor</h1>
+		<hr>
 		<form>
 		<label for="textinput">Text</label><br>
 		<textarea rows="1" type="text" id="textinput" name="textinput"></textarea><br>
@@ -161,10 +172,10 @@ joplin.plugins.register({
 		<textarea rows="1" type="text" id="citation" name="citation"></textarea> -->
 		</form>
 		</div>
-	
-		<div id="bportion">
+		
+		<div class="level-1" id="bportion">
 			<form>
-			<span id="tagspan"><textarea rows="1" type="text" id="tags" name="tags"></textarea></span>
+			<span class="align-horizontal" id="tagspan"><textarea rows="1" type="text" id="tags" name="tags"></textarea></span>
 			<label for="tags">Tags</label>
 			</form>
 			<button type="button" id="closeEditorButton">Close</button>

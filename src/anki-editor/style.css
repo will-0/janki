@@ -10,9 +10,9 @@ div.deck-selector {
 }
 
 hr {
-    border: 1px solid rgba(0, 0, 0, 0);
+    border: 0.1px solid rgba(0, 0, 0, 0);
     background-color: #c4c4c4b6;
-    /* height: 0.5px; */
+    height: 0px;
 }
 
 h1 {
