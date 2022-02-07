@@ -1,14 +1,27 @@
-div {
+div.level-1 {
     left: 16px;
     right: 16px;
     overflow-y: auto;
+}
+
+div.deck-selector {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+hr {
+    border: 1px solid rgba(0, 0, 0, 0);
+    background-color: #c4c4c4b6;
+    /* height: 0.5px; */
 }
 
 h1 {
     position: relative;
     font-family:'Segoe UI';
     font-size: 25px;
-    font-weight: 400;
+    font-weight: 350;
+    margin-top: 0;
+    margin-bottom: 0;
     /* text-decoration: underline;
     text-decoration-color: rgb(85, 85, 85); */
 }
@@ -46,9 +59,7 @@ body {
 background-color: #eeeeee;
 }
 
-button {
-    float: right;
-    width: 80px;
+button, select {
     height: 23px;
     margin: 0px 8px;
     color: black;
@@ -57,10 +68,24 @@ button {
     border: 0.5px solid rgb(192, 192, 192);
     border-radius: 4px;
     font-family:'Segoe UI';
-    
 }
 
-button:hover, .btn:focus {
+button {
+    float: right;
+    width: 80px;   
+}
+
+select {
+    appearance: none;
+    width: 100%;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    float: right;
+    margin: 0;
+    text-align: center;
+}
+
+button:hover, btn:focus {
     background-color: rgb(182, 205, 255);
     border-color: rgb(51, 51, 250);
     outline: 0;
@@ -68,7 +93,7 @@ button:hover, .btn:focus {
 
 #tportion {
     position: fixed;
-    top: 16px;
+    top: 0;
 }
 
 #bportion {
@@ -85,7 +110,9 @@ button:hover, .btn:focus {
     margin: 10px 0;
 }
 
-#tagspan {
+span.align-horizontal {
     display: block;
     padding-left: 40px;
+    margin-bottom: 10px;
+    margin-top: -1px;
 }

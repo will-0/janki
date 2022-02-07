@@ -79,7 +79,7 @@ async function createCard(message) {
 	return new Promise<void>(async (resolve, reject) =>
 	{
 			//check message conforms:
-	if (!message.hasOwnProperty("note_text") || !message.hasOwnProperty("note_extra") || !message.hasOwnProperty("note_tags"))
+	if (!message.hasOwnProperty("note_text") || !message.hasOwnProperty("note_extra") || !message.hasOwnProperty("note_tags") || !message.hasOwnProperty("deck_name"))
 	{
 		throw "Unexpected message from webview sandbox: insufficient information to create card";
 	}

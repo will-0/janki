@@ -24,7 +24,8 @@ async function createCard() {
         message_type : "card_create",
         note_text : document.getElementById("textinput").value,
         note_extra : document.getElementById("extra").value,
-        note_tags : document.getElementById("tags").value.split(" ")
+        note_tags : document.getElementById("tags").value.split(" "),
+        deck_name : document.getElementById("deck-selector").value
     }
     
     // Everything here will be handled asynchronously
