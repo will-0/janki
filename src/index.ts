@@ -8,6 +8,20 @@ import { title } from 'process';
 let invocation_reference = 0;
 let anki_clipboard: string;
 
+const default_anki_deck = "Conditions";
+var current_anki_deck;
+
+interface WebviewMessage {
+	message_type: string,
+	content?: any
+}
+
+interface WebviewMessageResponse {
+	success: boolean,
+	content?: any,
+	errmsg?: string,
+}
+
 function escapeHtml(unsafe)
 {
     return unsafe
@@ -192,7 +206,7 @@ joplin.plugins.register({
 
 		await joplin.views.panels.onMessage(panel, async (message) => {
 
-			return new Promise<boolean>((resolve, reject) => {
+			return new Promise<WebviewMessageResponse>((resolve, reject) => {
 				// I want to always return with a resolve, as I want to pass this message to the sandbox
 
 				console.log("Message received from sandbox");
@@ -201,29 +215,53 @@ joplin.plugins.register({
 				{
 					throw "Unexpected message from webview sandbox: no message_type property";
 				}
+
+				var response: WebviewMessageResponse = {success: null};
 	
 				switch(message.message_type) {
 					case "card_create":
 						createCard(message)
 							.then(() => {
-								resolve(true);
+								response.success = true;
+								resolve(response);
 							})
 							.catch(() => {
-								resolve(false)
+								response.success = false;
+								resolve(response)
 							})
-						return; //you have to add return to terminate completion of the function
+						break;
 	
 					case "close_note":
 						joplin.views.panels.hide(panel);
 						break;
+
+					case "get_deck":
+						if (typeof current_anki_deck === 'undefined' || current_anki_deck === null) {
+							response.content = default_anki_deck;
+						} else {
+							response.content = current_anki_deck;
+						}
+						response.success = true;
+						resolve(response);
+						break;
+
+					case "set_deck":
+						if (!message.hasOwnProperty("deck")) {
+							response.success = false;
+							response.errmsg = "Unexpected message from webview sandbox: no deck field for set_deck";
+							resolve(response);
+						}
+						current_anki_deck = message.deck;
+						response.success = true;
+						resolve(response);
+						break;
 						
 					default:
 						console.log("Unexpected message from webview sandbox: unknown message type");
-						resolve(false);
+						response.errmsg = "Unexpected message from webview sandbox: unknown message type";
+						response.success = false;
+						resolve(response)
 				}
-	
-				throw new Error("Should not reach this part of the function")
-
 			})
 		});
 

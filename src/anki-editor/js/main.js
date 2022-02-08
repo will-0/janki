@@ -1,3 +1,11 @@
+function assert_valid_response(response) {
+    if (!response.hasOwnProperty("success")) {
+        throw "No success property in response"
+    } else if (response.success != true && response.success != false) {
+        throw "Got invalid response value from plugin: response.success not equal to true or false"
+    }
+}
+
 function update_text_area_size()
 {
     var event = new Event('input', {
@@ -31,9 +39,10 @@ async function createCard() {
     // Everything here will be handled asynchronously
     webviewApi.postMessage(pluginmessage)
     .then((response) => {
-        console.log(response)
 
-        if (response==true)
+        assert_valid_response(response);
+
+        if (response.success==true)
         {
             console.log("Card creation success");
             document.getElementById("textinput").value = "";
@@ -55,19 +64,56 @@ async function closeEditor() {
         message_type : "close_note",
     }
 
+    console.log("Sending message to plugin");
+    
     const response = await webviewApi.postMessage(pluginmessage)
 
-    if (response==1)
+    assert_valid_response(response);
+
+    if (response.success==1)
     {
         console.log("Success");
-        document.getElementById("textinput").value = "";
-        document.getElementById("extra").value = "";
     }
     else
     {
         console.log("Failure");
     }
 }
+
+async function deck_selection_change() {
+
+    pluginmessage = {
+        message_type : "set_deck",
+        deck: document.getElementById("deck-selector").value
+    }
+
+    const response = await webviewApi.postMessage(pluginmessage)
+
+    assert_valid_response(response);
+
+    if (response.success==1)
+    {
+        console.log("Success");
+    }
+    else {console.log("Failure");}
+}
+
+async function update_deck() {
+    pluginmessage = {
+        message_type : "get_deck"
+    }
+
+    const response = await webviewApi.postMessage(pluginmessage)
+
+    assert_valid_response(response);
+
+    if (response.success==1)
+    {
+        console.log("Success");
+        document.getElementById("deck-selector").value = response.content;
+    }
+    else {console.log("Failure");}
+};
 
 // Script
 
@@ -99,6 +145,31 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
+// Not used, but left in here
+webviewApi.onMessage((message) => async function() {
+
+    console.log("Message received from plugin");
+
+    if (!message.hasOwnProperty("message_type"))
+    {
+        throw "Unexpected message from plugin: no message_type property";
+    }
+	
+    switch(message.message_type) {
+        case "post_deck":
+            console.log(message.content);
+            document.getElementById("deck-selector").value = message.content;
+            break;
+
+        default:
+            console.log("Unexpected message from plugin: unknown message type");
+    }
+});
+
 // Add functionality to the buttons
 document.getElementById("closeEditorButton").onclick = closeEditor;
 document.getElementById("createCardButton").onclick = createCard;
+document.getElementById("deck-selector").onchange = deck_selection_change;
+
+//Get the initial name for the deck-selector
+update_deck();
