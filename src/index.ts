@@ -88,6 +88,24 @@ async function get_note_hierarchy_string()
 	return title_stack.reverse().join("::");
 }
 
+async function getDeckNames() {
+	return new Promise<Array<String>>(async (resolve, reject) =>
+	{
+
+	anki_invoke('deckNames', 6)
+		.then(async deck_list => {
+			console.log(deck_list)
+			resolve(deck_list as Array<String>);
+		}
+		)
+		.catch(() => {
+			console.log("Error occured in logging value");
+			reject();
+		})
+
+	})
+}
+
 async function createCard(message) {
 
 	return new Promise<void>(async (resolve, reject) =>
@@ -137,12 +155,13 @@ async function createCard(message) {
 
 			if (note_content.includes(fact_hook)) {
 				
-				const replacement_text = "class=\"anki-fact\" data-anki-id=\"" + String(anki_note_id) + "\">"
+				const replacement_text = "class=\"anki-fact\" id=\"" + String(anki_note_id) + "\">" //legacy data-anki-id
 				const new_note_content = note_content.replace(fact_hook, replacement_text);
 
 				//checkme
 				await joplin.data.put(['notes', note.id], null, {body: new_note_content});
-				joplin.commands.execute("editor.setText", new_note_content);
+				await joplin.commands.execute("editor.setText", new_note_content);
+				// joplin.commands.execute("editor.scrollToHash", String(anki_note_id))
 			}
 			resolve();
 		}
@@ -236,6 +255,8 @@ joplin.plugins.register({
 						break;
 
 					case "get_deck":
+
+						// getDeckNames();
 						if (typeof current_anki_deck === 'undefined' || current_anki_deck === null) {
 							response.content = default_anki_deck;
 						} else {
