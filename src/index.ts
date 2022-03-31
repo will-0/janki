@@ -95,13 +95,16 @@ async function createCard(message) {
 	const hierarchy_string = "Janki::" + await get_note_hierarchy_string();
 	note_tags.push(hierarchy_string);
 
+	// Process the input for anki-compatible format (convert line breaks)
+	const processed_note_text = message.note_text.replace(/\r\n|\r|\n/g,"<br>")
+
 	// Build the AnkiConnect request
     const request = {
         "note": {
-            "deckName": "Conditions",
+            "deckName": message.deck_name,
             "modelName": "JankiDev",
             "fields": {
-                "Text": message.note_text,
+                "Text": processed_note_text,
                 "Extra": message.note_extra,
 				"Joplin Note External Link": "joplin://x-callback-url/openNote?id=" + note.id,
 				"Joplin Note ID": note.id
