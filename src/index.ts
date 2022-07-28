@@ -313,13 +313,14 @@ joplin.plugins.register({
 			},
 		});
 
+		await joplin.views.menuItems.create('Janki', 'janki_execute', MenuItemLocation.Edit, { accelerator: 'Ctrl+G' });
+
+		//HACKY SOLUTION
 		await joplin.commands.register({
 			name: 'blankcommand',
 			label: 'Blank Command',
 			execute: async () => {}
 		});
-
-		await joplin.views.menuItems.create('Janki', 'janki_execute', MenuItemLocation.Edit, { accelerator: 'Ctrl+G' });
 		await joplin.views.menuItems.create('Blank', 'blankcommand');
 	},
 });
