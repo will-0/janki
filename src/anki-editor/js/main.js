@@ -109,8 +109,20 @@ async function update_deck() {
 
     if (response.success==1)
     {
+        const deck_selector = document.getElementById("deck-selector")
+
+        //Clear deck selector
+        deck_selector.innerHTML = ""
+
+        response.content.deck_list.forEach(element => {
+            option = document.createElement("option");
+            option.value = element;
+            option.innerHTML = element;
+            deck_selector.appendChild(option)
+        });
+
         console.log("Success");
-        document.getElementById("deck-selector").value = response.content;
+        deck_selector.value = response.content.selected_deck;
     }
     else {console.log("Failure");}
 };

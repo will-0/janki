@@ -93,8 +93,13 @@ async function getDeckNames() {
 	{
 
 	anki_invoke('deckNames', 6)
-		.then(async deck_list => {
+		.then(async (deck_list: Array<string>) => {
 			console.log(deck_list)
+
+			let index = deck_list.indexOf("Default");
+			if (index !== -1) {
+				deck_list.splice(index, 1);
+			}
 			resolve(deck_list as Array<String>);
 		}
 		)
@@ -256,14 +261,34 @@ joplin.plugins.register({
 
 					case "get_deck":
 
-						// getDeckNames();
-						if (typeof current_anki_deck === 'undefined' || current_anki_deck === null) {
-							response.content = default_anki_deck;
-						} else {
-							response.content = current_anki_deck;
-						}
-						response.success = true;
-						resolve(response);
+						getDeckNames()
+							.then((deck_list: Array<String>) => {
+
+								let m_response = {
+									selected_deck: null,
+									deck_list: null
+								}
+
+
+
+								//Build the response packet
+								m_response.deck_list = deck_list;
+								if (typeof current_anki_deck === 'undefined' || current_anki_deck === null) {
+									m_response.selected_deck = default_anki_deck;
+								} else {
+									m_response.selected_deck = current_anki_deck;
+								}
+
+								response.content = m_response;
+
+								response.success = true;
+								resolve(response);
+							})
+							.catch(() => {
+								response.success = false;
+								resolve(response)
+							})
+
 						break;
 
 					case "set_deck":
@@ -315,7 +340,7 @@ joplin.plugins.register({
 
 		await joplin.views.menuItems.create('Janki', 'janki_execute', MenuItemLocation.Edit, { accelerator: 'Ctrl+G' });
 
-		//HACKY SOLUTION
+		//HACKY SOLUTION TO JOPLIN BUG: SEE https://github.com/laurent22/joplin/issues/6699
 		await joplin.commands.register({
 			name: 'blankcommand',
 			label: 'Blank Command',
