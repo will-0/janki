@@ -287,8 +287,8 @@ joplin.plugins.register({
 		});
 
 		await joplin.commands.register({
-			name: 'janki_higlight',
-			label: 'Highlights text and prints to console',
+			name: 'janki_execute',
+			label: 'Janki Command',
 			execute: async () => {
 
 				const anki_editor_open = await joplin.views.panels.visible(panel);
@@ -313,7 +313,13 @@ joplin.plugins.register({
 			},
 		});
 
-		await joplin.views.menuItems.create('Janki', 'janki_higlight', MenuItemLocation.Edit, { accelerator: 'Ctrl+G' });
-	},
+		await joplin.commands.register({
+			name: 'blankcommand',
+			label: 'Blank Command',
+			execute: async () => {}
+		});
 
+		await joplin.views.menuItems.create('Janki', 'janki_execute', MenuItemLocation.Edit, { accelerator: 'Ctrl+G' });
+		await joplin.views.menuItems.create('Blank', 'blankcommand');
+	},
 });
