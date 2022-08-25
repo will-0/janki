@@ -22,6 +22,7 @@ h1 {
     font-weight: 350;
     margin-top: 0;
     margin-bottom: 0;
+    color: black;
     /* text-decoration: underline;
     text-decoration-color: rgb(85, 85, 85); */
 }
@@ -47,6 +48,7 @@ border: 2px solid rgb(219, 171, 109);
 label {
 font-size: 12px;
 font-family:'Segoe UI';
+color: black;
 }
 
 label[for=tags] {
