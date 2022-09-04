@@ -111,73 +111,95 @@ async function getDeckNames() {
 	})
 }
 
-async function createCard(message) {
+/**
+ * Searches the message for image references, 
+ */
+function extract_images(note_text)
+{
+	const img_regex = /\!\[[0-9a-z]{32}\.[a-zA-Z]{1,5}\]\(:\/([0-9a-z]{32})/g
+	const resource_match_array = [...note_text.matchAll(img_regex)]
 
+	const resource_id_array = resource_match_array.map(element => element[1])
+}
+
+/**
+ * Uses AnkiConnect to create a new card based on the message sent from the WebView
+ * @param message Message struct sent from webview
+ * @returns Promise<void>
+ */
+async function createCard(message) 
+{
 	return new Promise<void>(async (resolve, reject) =>
 	{
-			//check message conforms:
-	if (!message.hasOwnProperty("note_text") || !message.hasOwnProperty("note_extra") || !message.hasOwnProperty("note_tags") || !message.hasOwnProperty("deck_name"))
-	{
-		throw "Unexpected message from webview sandbox: insufficient information to create card";
-	}
-
-	const note = await joplin.workspace.selectedNote();
-
-	// // Manage the note tags
-	const note_tags = message.note_tags;
-	if (note_tags.includes("dev")) {note_tags.push("dev")};
-	if (note_tags.includes("janki")) {note_tags.push("janki")};
-
-	// //Get the hierarchy string
-	const hierarchy_string = "Janki::" + await get_note_hierarchy_string();
-	note_tags.push(hierarchy_string);
-
-	// Process the input for anki-compatible format (convert line breaks)
-	const processed_note_text = message.note_text.replace(/\r\n|\r|\n/g,"<br>")
-
-	// Build the AnkiConnect request
-    const request = {
-        "note": {
-            "deckName": message.deck_name,
-            "modelName": "JankiDev",
-            "fields": {
-                "Text": processed_note_text,
-                "Extra": message.note_extra,
-				"Joplin Note External Link": "joplin://x-callback-url/openNote?id=" + note.id,
-				"Joplin Note ID": note.id
-            },
-            "tags": note_tags
-        }
-    }
-
-	anki_invoke('addNote', 6, request)
-		.then(async anki_note_id => {
-
-			const note_content = note.body
-
-			const fact_hook = "class=\"unverified-anki\" data-invocation-reference=\"" + String(invocation_reference) + "\">"
-
-
-			if (note_content.includes(fact_hook)) {
-				
-				const replacement_text = "class=\"anki-fact\" id=\"" + String(anki_note_id) + "\">" //legacy data-anki-id
-				const new_note_content = note_content.replace(fact_hook, replacement_text);
-
-				//checkme
-				await joplin.data.put(['notes', note.id], null, {body: new_note_content});
-				await joplin.commands.execute("editor.setText", new_note_content);
-				// joplin.commands.execute("editor.scrollToHash", String(anki_note_id))
-			}
-			resolve();
+		//check message conforms:
+		if (!message.hasOwnProperty("note_text") || !message.hasOwnProperty("note_extra") || !message.hasOwnProperty("note_tags") || !message.hasOwnProperty("deck_name"))
+		{
+			throw "Unexpected message from webview sandbox: insufficient information to create card";
 		}
-		)
-		.catch(() => {
-			console.log("Error occured in logging value");
-			reject();
-		})
+
+		const note = await joplin.workspace.selectedNote();
+
+		// // Manage the note tags
+		const note_tags = message.note_tags;
+		if (note_tags.includes("dev")) {note_tags.push("dev")};
+		if (note_tags.includes("janki")) {note_tags.push("janki")};
+
+		// //Get the hierarchy string
+		const hierarchy_string = "Janki::" + await get_note_hierarchy_string();
+		note_tags.push(hierarchy_string);
+
+		let processed_note_text : string = message.note_text;
+
+		//Extract the image data
+		const img_data = extract_images(processed_note_text);
+
+		// Process the input for anki-compatible format (convert line breaks)
+		processed_note_text = processed_note_text.replace(/\r\n|\r|\n/g,"<br>")
+
+		// Build the AnkiConnect request
+		let request = {
+			"note": {
+				"deckName": message.deck_name,
+				"modelName": "JankiDev",
+				"fields": {
+					"Text": processed_note_text,
+					"Extra": message.note_extra,
+					"Joplin Note External Link": "joplin://x-callback-url/openNote?id=" + note.id,
+					"Joplin Note ID": note.id
+				},
+				"tags": note_tags,
+				"image": img_data
+			}
+		}
+
+		anki_invoke('addNote', 6, request)
+			.then(async anki_note_id => {
+
+				const note_content = note.body
+
+				const fact_hook = "class=\"unverified-anki\" data-invocation-reference=\"" + String(invocation_reference) + "\">"
+
+
+				if (note_content.includes(fact_hook)) {
+					
+					const replacement_text = "class=\"anki-fact\" id=\"" + String(anki_note_id) + "\">" //legacy data-anki-id
+					const new_note_content = note_content.replace(fact_hook, replacement_text);
+
+					//checkme
+					await joplin.data.put(['notes', note.id], null, {body: new_note_content});
+					await joplin.commands.execute("editor.setText", new_note_content);
+					// joplin.commands.execute("editor.scrollToHash", String(anki_note_id))
+				}
+				resolve();
+			}
+			)
+			.catch(() => {
+				console.log("Error occured in logging value");
+				reject();
+			})
 
 	})
-	}
+}
 
 joplin.plugins.register({
 
